@@ -238,6 +238,13 @@ function session(options) {
         touched = true
       }
 
+      // NOTE: Support multiple domains with dynamic cookie domain option for the same web server
+      // (e.g. www.domain1.com, sub1.domain1.com, www.domain2.com, sub2.domain2.com)
+      if (typeof cookieOptions.dwMultiDomainFn === 'function' && req.session.cookie &&
+          req.headers && req.headers.host) {
+        req.session.cookie.domain = cookieOptions.dwMultiDomainFn(req.headers.host);
+      }
+
       // set cookie
       setcookie(res, name, req.sessionID, secrets[0], req.session.cookie.data);
     });
